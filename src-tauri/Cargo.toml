@@ -32,7 +32,7 @@ trash = "3"
 # Task 5 应用卸载器:解析 .app bundle 的 Info.plist(CFBundleIdentifier)。
 plist = "1"
 # 大文件扫描:sha2 计算重复文件哈希。
-sha2 = "0.10"
+sha2 = "0.11"
 
 [dev-dependencies]
 tempfile = "3"
