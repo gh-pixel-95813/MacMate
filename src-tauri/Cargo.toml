@@ -41,7 +41,7 @@ filetime = "0.2"
 
 # macOS 专属:用于调用 NSWorkspace.recycleURLs。Linux 上不会被编译或抓取。
 [target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.26"
+cocoa = "0.27"
 objc = "0.2"
 
 [profile.release]
