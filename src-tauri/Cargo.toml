@@ -22,7 +22,7 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 walkdir = "2"
-sysinfo = "0.32"
+sysinfo = "0.39"
 thiserror = "1"
 # `dirs` 用于在 macOS 上解析当前用户 home 目录,供 Task 4+ 的扫描器使用。
 dirs = "5"
