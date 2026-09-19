@@ -27,19 +27,28 @@ jobs:
             });
             core.setOutput('version', res.data.tag_name.replace('v',''));
             core.setOutput('tag', res.data.tag_name);
-      - name: Download dmg and compute sha256
+      - name: Download dmgs and compute sha256
         id: sha
         run: |
-          curl -L "https://github.com/gh-pixel-95813/MacMate/releases/download/${{ steps.release.outputs.tag }}/MacMate_${{ steps.release.outputs.version }}_aarch64.dmg" -o macmate.dmg
-          echo "sha256=$(shasum -a 256 macmate.dmg | awk '{print $1}')" >> $GITHUB_OUTPUT
-      - name: Update Cask
+          curl -L "https://github.com/gh-pixel-95813/MacMate/releases/download/${{ steps.release.outputs.tag }}/MacMate_${{ steps.release.outputs.version }}_aarch64.dmg" -o macmate-aarch64.dmg
+          curl -L "https://github.com/gh-pixel-95813/MacMate/releases/download/${{ steps.release.outputs.tag }}/MacMate_${{ steps.release.outputs.version }}_x64.dmg" -o macmate-x64.dmg
+          echo "aarch64_sha256=$(shasum -a 256 macmate-aarch64.dmg | awk '{print $1}')" >> $GITHUB_OUTPUT
+          echo "x64_sha256=$(shasum -a 256 macmate-x64.dmg | awk '{print $1}')" >> $GITHUB_OUTPUT
+      - name: Update Casks (arm64 + x64)
         run: |
-          sed -i "s/version \".*\"/version \"${{ steps.release.outputs.version }}\"/" Casks/macmate.rb
-          sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha.outputs.sha256 }}\"/" Casks/macmate.rb
+          VERSION="${{ steps.release.outputs.version }}"
+          A64_SHA="${{ steps.sha.outputs.aarch64_sha256 }}"
+          X64_SHA="${{ steps.sha.outputs.x64_sha256 }}"
+          # arm64 cask
+          sed -i "s/version \".*\"/version \"$VERSION\"/" Casks/macmate.rb
+          sed -i "s/sha256 \".*\"/sha256 \"$A64_SHA\"/" Casks/macmate.rb
+          # intel cask
+          sed -i "s/version \".*\"/version \"$VERSION\"/" Casks/macmate-x64.rb
+          sed -i "s/sha256 \".*\"/sha256 \"$X64_SHA\"/" Casks/macmate-x64.rb
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Casks/macmate.rb
-          git commit -m "Bump macmate to ${{ steps.release.outputs.version }}" || exit 0
+          git add Casks/macmate.rb Casks/macmate-x64.rb
+          git commit -m "Bump macmate to ${{ steps.release.outputs.version }} (arm64 + x64)" || exit 0
           git push
