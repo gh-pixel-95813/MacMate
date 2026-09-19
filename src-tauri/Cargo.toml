@@ -25,7 +25,7 @@ walkdir = "2"
 sysinfo = "0.32"
 thiserror = "1"
 # `dirs` 用于在 macOS 上解析当前用户 home 目录,供 Task 4+ 的扫描器使用。
-dirs = "5"
+dirs = "6"
 # `trash` 在 macOS 上作为 NSWorkspace 调用失败的回退,在非 macOS 平台作为主路径,
 # 故作为常规依赖(跨平台可用)。
 trash = "3"
