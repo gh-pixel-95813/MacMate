@@ -1,0 +1,284 @@
+<script setup lang="ts">
+// 设置页(Task 9.2):4 个分区,保留 Task 8 的深度清理开关。
+// - 通用:语言下拉 + 主题三按钮
+// - 清理:深度清理开关(Task 8)+ 大文件阈值数字输入
+// - 数据:清空清理历史 + 打开配置目录
+// - 关于:版本 / GitHub / License
+import { computed, ref } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+import { useI18n } from 'vue-i18n';
+import { i18n } from '@/i18n';
+import { useAppStore, type Theme } from '@/stores/app';
+import { useTheme } from '@/composables/useTheme';
+
+const { t } = useI18n();
+const appStore = useAppStore();
+const theme = useTheme();
+
+const deepCleanOn = computed(() => appStore.deepClean);
+
+function toggleDeepClean() {
+  appStore.setDeepClean(!appStore.deepClean);
+}
+
+// 通用:语言切换。change 时同步 i18n.global.locale.value(由 store.setLocale 持久化)。
+function onLocaleChange(e: Event) {
+  const value = (e.target as HTMLSelectElement).value as 'zh-CN' | 'en-US';
+  i18n.global.locale.value = value;
+  appStore.setLocale(value);
+}
+
+// 通用:主题切换。三按钮,由 store.setTheme 持久化,useTheme 的 watch 自动应用 dark class。
+function onThemeChange(value: Theme) {
+  appStore.setTheme(value);
+  theme.apply();
+}
+
+// 清理:大文件阈值输入(单位 MB)。change 时持久化。
+function onThresholdChange(e: Event) {
+  const raw = Number((e.target as HTMLInputElement).value);
+  if (Number.isFinite(raw) && raw > 0) {
+    appStore.setLargeFileThresholdMb(Math.floor(raw));
+  }
+}
+
+// 数据:清空清理历史。
+const clearingHistory = ref(false);
+const clearHistoryMsg = ref<string | null>(null);
+
+async function onClearHistory() {
+  clearingHistory.value = true;
+  clearHistoryMsg.value = null;
+  try {
+    await invoke('clear_clean_history');
+    clearHistoryMsg.value = t('dashboard.clearHistory') + ' ✓';
+  } catch (e) {
+    clearHistoryMsg.value = String(e);
+  } finally {
+    clearingHistory.value = false;
+  }
+}
+
+// 数据:打开配置目录(macOS 用 open,非 macOS stub 成功)。
+const openDirMsg = ref<string | null>(null);
+
+async function onOpenConfigDir() {
+  openDirMsg.value = null;
+  try {
+    await invoke('reveal_config_dir');
+  } catch (e) {
+    // 非 macOS 或 home 不可解析:回退显示路径提示。
+    openDirMsg.value = `${String(e)} (~/.macmate/)`;
+  }
+}
+
+// 关于:版本硬编码(与 package.json / AppSidebar 一致)。
+const APP_VERSION = '0.1.0';
+const GITHUB_URL = 'https://github.com/gh-pixel-95813/MacMate';
+const LICENSE_NAME = 'MIT';
+
+// 主题选项:跟随系统 / 浅色 / 暗色,与 store.theme 对齐。
+const themeOptions: Array<{ value: Theme; labelKey: string }> = [
+  { value: 'system', labelKey: 'theme.system' },
+  { value: 'light', labelKey: 'theme.light' },
+  { value: 'dark', labelKey: 'theme.dark' },
+];
+</script>
+
+<template>
+  <div class="p-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      {{ t('page.settings') }}
+    </h1>
+
+    <!-- 分区 1:通用 -->
+    <section class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ t('settings.general') }}
+      </h2>
+      <div
+        class="mt-3 space-y-4 rounded-2xl border border-gray-200/60 bg-white/70 p-5 backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-900/70"
+      >
+        <!-- 语言切换 -->
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {{ t('settings.language') }}
+            </h3>
+          </div>
+          <select
+            :value="appStore.locale"
+            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-100"
+            @change="onLocaleChange"
+          >
+            <option value="zh-CN">简体中文</option>
+            <option value="en-US">English</option>
+          </select>
+        </div>
+        <!-- 主题切换 -->
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {{ t('settings.theme') }}
+            </h3>
+          </div>
+          <div class="flex overflow-hidden rounded-md border border-gray-300 dark:border-zinc-700">
+            <button
+              v-for="opt in themeOptions"
+              :key="opt.value"
+              type="button"
+              class="px-3 py-1 text-xs font-medium transition-colors"
+              :class="
+                appStore.theme === opt.value
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700'
+              "
+              @click="onThemeChange(opt.value)"
+            >
+              {{ t(opt.labelKey) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 分区 2:清理(深度清理开关 + 大文件阈值) -->
+    <section class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ t('settings.cleaning') }}
+      </h2>
+      <div
+        class="mt-3 space-y-4 rounded-2xl border border-gray-200/60 bg-white/70 p-5 backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-900/70"
+      >
+        <!-- 深度清理开关(Task 8,保留) -->
+        <div class="flex items-center gap-4">
+          <div class="min-w-0 flex-1">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {{ t('settings.deepClean') }}
+            </h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-zinc-400">
+              {{ deepCleanOn ? t('settings.deepCleanOn') : t('settings.deepCleanOff') }}
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="deepCleanOn"
+            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
+            :class="deepCleanOn ? 'bg-red-600' : 'bg-gray-300 dark:bg-zinc-600'"
+            @click="toggleDeepClean"
+          >
+            <span
+              class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
+              :class="deepCleanOn ? 'translate-x-5' : 'translate-x-0.5'"
+            />
+          </button>
+        </div>
+        <div
+          v-if="deepCleanOn"
+          class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+        >
+          {{ t('settings.deepCleanWarning') }}
+        </div>
+
+        <!-- 大文件扫描阈值 -->
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {{ t('settings.largeFileThreshold') }}
+            </h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-zinc-400">
+              {{ t('settings.largeFileThresholdHint') }}
+            </p>
+          </div>
+          <input
+            type="number"
+            min="1"
+            :value="appStore.largeFileThresholdMb"
+            class="w-24 rounded-md border border-gray-300 bg-white px-3 py-1 text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-100"
+            @change="onThresholdChange"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- 分区 3:数据 -->
+    <section class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ t('settings.data') }}
+      </h2>
+      <div
+        class="mt-3 space-y-3 rounded-2xl border border-gray-200/60 bg-white/70 p-5 backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-900/70"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300">
+            {{ t('settings.clearHistory') }}
+          </span>
+          <button
+            type="button"
+            :disabled="clearingHistory"
+            class="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-50 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+            @click="onClearHistory"
+          >
+            {{ clearingHistory ? '…' : t('dashboard.clearHistory') }}
+          </button>
+        </div>
+        <p v-if="clearHistoryMsg" class="text-xs text-gray-500 dark:text-gray-400">
+          {{ clearHistoryMsg }}
+        </p>
+
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300">
+            {{ t('settings.openConfigDir') }}
+          </span>
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+            @click="onOpenConfigDir"
+          >
+            {{ t('settings.openConfigDir') }}
+          </button>
+        </div>
+        <p v-if="openDirMsg" class="text-xs text-gray-500 dark:text-gray-400">
+          {{ openDirMsg }}
+        </p>
+      </div>
+    </section>
+
+    <!-- 分区 4:关于 -->
+    <section class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ t('settings.about') }}
+      </h2>
+      <div
+        class="mt-3 space-y-3 rounded-2xl border border-gray-200/60 bg-white/70 p-5 backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-900/70"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.version') }}</span>
+          <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            v{{ APP_VERSION }}
+          </span>
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300">
+            {{ t('settings.githubRepo') }}
+          </span>
+          <a
+            :href="GITHUB_URL"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+          >
+            {{ GITHUB_URL }}
+          </a>
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.license') }}</span>
+          <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {{ LICENSE_NAME }}
+          </span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>

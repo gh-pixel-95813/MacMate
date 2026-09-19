@@ -1,0 +1,45 @@
+name: Update Homebrew Tap
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+permissions:
+  contents: write
+jobs:
+  update-tap:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: gh-pixel-95813/homebrew-tap
+          token: ${{ secrets.TAP_REPO_TOKEN }}
+      - name: Get latest release
+        id: release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.TAP_REPO_TOKEN }}
+          script: |
+            const res = await github.rest.repos.getLatestRelease({
+              owner: 'gh-pixel-95813',
+              repo: 'MacMate'
+            });
+            core.setOutput('version', res.data.tag_name.replace('v',''));
+            core.setOutput('tag', res.data.tag_name);
+      - name: Download dmg and compute sha256
+        id: sha
+        run: |
+          curl -L "https://github.com/gh-pixel-95813/MacMate/releases/download/${{ steps.release.outputs.tag }}/MacMate_${{ steps.release.outputs.version }}_aarch64.dmg" -o macmate.dmg
+          echo "sha256=$(shasum -a 256 macmate.dmg | awk '{print $1}')" >> $GITHUB_OUTPUT
+      - name: Update Cask
+        run: |
+          sed -i "s/version \".*\"/version \"${{ steps.release.outputs.version }}\"/" Casks/macmate.rb
+          sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha.outputs.sha256 }}\"/" Casks/macmate.rb
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/macmate.rb
+          git commit -m "Bump macmate to ${{ steps.release.outputs.version }}" || exit 0
+          git push

@@ -1,0 +1,149 @@
+{
+  "app": {
+    "name": "MacMate",
+    "tagline": "Free, open-source macOS cleaner"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "systemJunk": "System Junk",
+    "uninstaller": "Uninstaller",
+    "largeFiles": "Large Files",
+    "privacy": "Privacy",
+    "settings": "Settings"
+  },
+  "page": {
+    "dashboard": "Dashboard",
+    "systemJunk": "System Junk",
+    "uninstaller": "Uninstaller",
+    "largeFiles": "Large Files",
+    "privacy": "Privacy",
+    "settings": "Settings"
+  },
+  "theme": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "disk": {
+    "used": "Used",
+    "total": "Total",
+    "available": "Available"
+  },
+  "common": {
+    "scan": "Scan",
+    "clean": "Clean",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "total": "Total",
+    "size": "Size",
+    "path": "Path",
+    "developing": "Under Development"
+  },
+  "confirm": {
+    "title": "Confirm",
+    "message": "Please confirm to continue",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "detailCount": "...and {count} more"
+  },
+  "settings": {
+    "deepClean": "Deep Clean",
+    "deepCleanWarning": "Requires admin password, use with caution",
+    "deepCleanOff": "Off, only user-level caches",
+    "deepCleanOn": "On, scans system-level directories and needs admin authorization",
+    "general": "General",
+    "cleaning": "Cleaning",
+    "data": "Data",
+    "about": "About",
+    "language": "Language",
+    "theme": "Theme",
+    "largeFileThreshold": "Large File Threshold",
+    "largeFileThresholdHint": "In MB, files larger than this appear in the large files list",
+    "clearHistory": "Clear Clean History",
+    "openConfigDir": "Open Config Dir",
+    "version": "Version",
+    "githubRepo": "GitHub Repo",
+    "license": "License"
+  },
+  "history": {
+    "title": "Clean History",
+    "empty": "No history yet",
+    "freed": "Freed {size}"
+  },
+  "dashboard": {
+    "quickActions": "Quick Actions",
+    "moduleSystemJunk": "Scan and clean macOS user-level caches, logs and temp files",
+    "moduleUninstaller": "Fully uninstall apps and clean related files",
+    "moduleLargeFiles": "Find files taking too much space and duplicates",
+    "modulePrivacy": "Clean browser history and system recent documents",
+    "recentHistory": "Recent Clean History",
+    "clearHistory": "Clear History",
+    "noHistory": "No history yet"
+  },
+  "privacy": {
+    "safari": "Safari",
+    "chrome": "Chrome",
+    "firefox": "Firefox",
+    "system": "System",
+    "notInstalled": "Not Installed",
+    "running": "Running, please close",
+    "history": "History",
+    "cookies": "Cookies",
+    "cache": "Cache",
+    "downloads": "Downloads",
+    "formData": "Form Data",
+    "recentDocuments": "Recent Documents",
+    "closeBrowser": "Please close the browser before cleaning",
+    "confirmTitle": "Confirm Clean",
+    "confirmClean": "About to clean {count} privacy items ({size})"
+  },
+  "largeFiles": {
+    "tabLarge": "Large Files",
+    "tabDuplicates": "Duplicates",
+    "threshold": "Threshold",
+    "scanPaths": "Scan Paths",
+    "video": "Video",
+    "image": "Image",
+    "archive": "Archive",
+    "other": "Other",
+    "duplicateGroup": "{count} duplicates",
+    "keepFirst": "Keep oldest",
+    "deleteSelected": "Delete Selected",
+    "scanning": "Scanning…",
+    "noResults": "No results yet, click Scan to start",
+    "freed": "Will free",
+    "confirmTitle": "Confirm Delete",
+    "confirmDelete": "About to delete {count} files ({size})",
+    "fileName": "File Name",
+    "modifiedAt": "Modified",
+    "selectNone": "Select None",
+    "selectAll": "Select All",
+    "selectedCount": "{count} selected"
+  },
+  "systemJunk": {
+    "selected": "{count} items selected, {size}",
+    "confirmTitle": "Confirm Clean",
+    "confirmClean": "About to delete {count} items ({size}). Moved to Trash, restorable for 30 days.",
+    "cleaning": "Cleaning...",
+    "cleanComplete": "Done: {success} ok, {failed} failed, {size} freed",
+    "empty": "Nothing to clean",
+    "safety": {
+      "safe": "Safe",
+      "caution": "Caution",
+      "danger": "Danger"
+    },
+    "modifiedAt": "Modified",
+    "safetyLevel": "Safety",
+    "scanning": "Scanning..."
+  },
+  "uninstaller": {
+    "scanApps": "Scan Apps",
+    "searchPlaceholder": "Search apps...",
+    "uninstall": "Uninstall",
+    "appRunning": "App is running, please close it first",
+    "notExist": "Not exist",
+    "relatedFiles": "Related files",
+    "confirmTitle": "Confirm Uninstall",
+    "confirmUninstall": "Uninstall {name} and {related} related files ({size})"
+  }
+}

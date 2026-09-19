@@ -1,0 +1,149 @@
+{
+  "app": {
+    "name": "MacMate",
+    "tagline": "免费、开源的 macOS 清理工具"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "systemJunk": "系统垃圾",
+    "uninstaller": "应用卸载器",
+    "largeFiles": "大文件扫描",
+    "privacy": "隐私清理",
+    "settings": "设置"
+  },
+  "page": {
+    "dashboard": "仪表盘",
+    "systemJunk": "系统垃圾",
+    "uninstaller": "应用卸载器",
+    "largeFiles": "大文件扫描",
+    "privacy": "隐私清理",
+    "settings": "设置"
+  },
+  "theme": {
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "暗色"
+  },
+  "disk": {
+    "used": "已用",
+    "total": "总量",
+    "available": "可用"
+  },
+  "common": {
+    "scan": "扫描",
+    "clean": "清理",
+    "cancel": "取消",
+    "confirm": "确认",
+    "total": "总计",
+    "size": "大小",
+    "path": "路径",
+    "developing": "开发中"
+  },
+  "confirm": {
+    "title": "确认操作",
+    "message": "请确认是否继续",
+    "confirm": "确认",
+    "cancel": "取消",
+    "detailCount": "...等 {count} 项"
+  },
+  "settings": {
+    "deepClean": "深度清理",
+    "deepCleanWarning": "深度清理需要管理员密码,请谨慎使用",
+    "deepCleanOff": "已关闭,仅清理用户级缓存",
+    "deepCleanOn": "已开启,扫描系统级目录并需管理员授权",
+    "general": "通用",
+    "cleaning": "清理",
+    "data": "数据",
+    "about": "关于",
+    "language": "语言",
+    "theme": "主题",
+    "largeFileThreshold": "大文件阈值",
+    "largeFileThresholdHint": "单位 MB,大于此值的文件将进入大文件列表",
+    "clearHistory": "清空清理历史",
+    "openConfigDir": "打开配置目录",
+    "version": "版本",
+    "githubRepo": "GitHub 仓库",
+    "license": "许可证"
+  },
+  "history": {
+    "title": "清理历史",
+    "empty": "暂无历史",
+    "freed": "释放 {size}"
+  },
+  "dashboard": {
+    "quickActions": "快速操作",
+    "moduleSystemJunk": "扫描并清理 macOS 用户级缓存、日志与临时文件",
+    "moduleUninstaller": "完整卸载应用并清理关联文件",
+    "moduleLargeFiles": "查找占用空间过大的文件与重复项",
+    "modulePrivacy": "清理浏览器历史与系统最近文档",
+    "recentHistory": "最近清理历史",
+    "clearHistory": "清空历史",
+    "noHistory": "暂无历史"
+  },
+  "privacy": {
+    "safari": "Safari",
+    "chrome": "Chrome",
+    "firefox": "Firefox",
+    "system": "系统",
+    "notInstalled": "未安装",
+    "running": "运行中,请关闭",
+    "history": "历史记录",
+    "cookies": "Cookies",
+    "cache": "缓存",
+    "downloads": "下载历史",
+    "formData": "表单数据",
+    "recentDocuments": "最近文档",
+    "closeBrowser": "请先关闭对应浏览器再清理",
+    "confirmTitle": "确认清理",
+    "confirmClean": "将清理 {count} 项隐私数据,共 {size}"
+  },
+  "largeFiles": {
+    "tabLarge": "大文件",
+    "tabDuplicates": "重复文件",
+    "threshold": "阈值",
+    "scanPaths": "扫描路径",
+    "video": "视频",
+    "image": "图片",
+    "archive": "压缩包",
+    "other": "其他",
+    "duplicateGroup": "{count} 个重复",
+    "keepFirst": "保留最早修改",
+    "deleteSelected": "删除选中",
+    "scanning": "扫描中…",
+    "noResults": "暂无结果,点击扫描开始",
+    "freed": "将释放",
+    "confirmTitle": "确认删除",
+    "confirmDelete": "将删除 {count} 个文件,共 {size}",
+    "fileName": "文件名",
+    "modifiedAt": "修改时间",
+    "selectNone": "全不选",
+    "selectAll": "全选",
+    "selectedCount": "已选 {count} 项"
+  },
+  "systemJunk": {
+    "selected": "已勾选 {count} 项,共 {size}",
+    "confirmTitle": "确认清理",
+    "confirmClean": "将删除 {count} 项,共 {size},移至废纸篓后可在 30 天内恢复",
+    "cleaning": "清理中...",
+    "cleanComplete": "清理完成:成功 {success} 项,失败 {failed} 项,释放 {size}",
+    "empty": "无可清理项",
+    "safety": {
+      "safe": "安全",
+      "caution": "谨慎",
+      "danger": "危险"
+    },
+    "modifiedAt": "修改时间",
+    "safetyLevel": "安全等级",
+    "scanning": "扫描中..."
+  },
+  "uninstaller": {
+    "scanApps": "扫描应用",
+    "searchPlaceholder": "搜索应用名…",
+    "uninstall": "卸载",
+    "appRunning": "应用运行中,请先关闭",
+    "notExist": "不存在",
+    "relatedFiles": "关联文件",
+    "confirmTitle": "确认卸载",
+    "confirmUninstall": "将卸载 {name} 及 {related} 个关联文件,共 {size}"
+  }
+}
