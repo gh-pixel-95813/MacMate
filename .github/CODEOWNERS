@@ -1,0 +1,11 @@
+# Default owners for the repo
+* @gh-pixel-95813
+
+# Backend Rust code
+/src-tauri/ @gh-pixel-95813
+
+# Frontend Vue/TS code
+/src/ @gh-pixel-95813
+
+# CI/CD workflows
+/.github/workflows/ @gh-pixel-95813
