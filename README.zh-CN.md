@@ -48,10 +48,21 @@
 
 ## 安装
 
+### Apple Silicon (M1/M2/M3+)
+
 ```bash
 brew tap gh-pixel-95813/tap
 brew install --cask macmate
 ```
+
+### Intel
+
+```bash
+brew tap gh-pixel-95813/tap
+brew install --cask macmate-x64
+```
+
+> 或使用一行命令：`brew install --cask gh-pixel-95813/tap/macmate`
 
 或从 [Releases](https://github.com/gh-pixel-95813/MacMate/releases) 下载
 

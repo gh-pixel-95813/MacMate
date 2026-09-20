@@ -48,10 +48,21 @@ Free, open-source macOS cleaner built with Tauri + Vue 3. A lightweight alternat
 
 ## Install
 
+### Apple Silicon (M1/M2/M3+)
+
 ```bash
 brew tap gh-pixel-95813/tap
 brew install --cask macmate
 ```
+
+### Intel
+
+```bash
+brew tap gh-pixel-95813/tap
+brew install --cask macmate-x64
+```
+
+> Or use the one-liner: `brew install --cask gh-pixel-95813/tap/macmate`
 
 Or download from [Releases](https://github.com/gh-pixel-95813/MacMate/releases)
 
