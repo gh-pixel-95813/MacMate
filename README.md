@@ -51,6 +51,7 @@ Free, open-source macOS cleaner built with Tauri + Vue 3. A lightweight alternat
 ### Install
 
 ```bash
+brew tap gh-pixel-95813/tap
 brew install --cask macmate
 ```
 
@@ -123,6 +124,7 @@ MIT © MacMate Contributors
 ### 安装
 
 ```bash
+brew tap gh-pixel-95813/tap
 brew install --cask macmate
 ```
 
