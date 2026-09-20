@@ -32,6 +32,10 @@ jobs:
         with:
           workspaces: src-tauri
       - run: pnpm install --frozen-lockfile
+      # 从 1024x1024 源图生成所有图标格式(含 macOS 必需的 icon.icns 和 Windows 的 icon.ico)。
+      # tauri icon 在 macOS runner 上会调用系统自带的 iconutil 生成 .icns。
+      - name: Generate app icons (incl. .icns)
+        run: pnpm tauri icon src-tauri/icons/icon-source.png
       - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
