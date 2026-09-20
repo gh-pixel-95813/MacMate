@@ -22,22 +22,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.language == 'rust' && 'manual' || 'none' }}
-      - name: Autobuild (JS/TS)
-        if: matrix.language == 'javascript-typescript'
-        uses: github/codeql-action/autobuild@v3
       - name: Install Linux system dependencies (Tauri)
         if: matrix.language == 'rust'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: Build Rust
-        if: matrix.language == 'rust'
-        run: cargo build --manifest-path src-tauri/Cargo.toml
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # 新版 CodeQL 的 Rust 提取器不再支持 manual 构建模式,
+          # 必须用 none(提取器内部自行调用 cargo 构建并提取)。
+          build-mode: none
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
