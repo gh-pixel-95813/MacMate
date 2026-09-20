@@ -1,7 +1,7 @@
-cask "macmate" do
+cask "macmate-x64" do
   version "0.2.0"
   sha256 "REPLACE_WITH_ACTUAL_SHA256"
-  url "https://github.com/gh-pixel-95813/MacMate/releases/download/v#{version}/MacMate_#{version}_aarch64.dmg"
+  url "https://github.com/gh-pixel-95813/MacMate/releases/download/v#{version}/MacMate_#{version}_x64.dmg"
   name "MacMate"
   desc "Free, open-source macOS cleaner built with Tauri"
   homepage "https://github.com/gh-pixel-95813/MacMate"
@@ -9,7 +9,7 @@ cask "macmate" do
     url :url
     strategy :github_latest
   end
-  depends_on arch: :arm64
+  depends_on arch: :x86_64
   app "MacMate.app"
   zap trash: [
     "~/Library/Preferences/com.macmate.app.plist",

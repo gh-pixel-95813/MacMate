@@ -81,6 +81,14 @@ pub async fn get_clean_history() -> Result<Vec<CleanHistoryEntry>, AppError> {
 /// 追加一条清理历史。超过 100 条自动删除最旧的。
 #[tauri::command]
 pub async fn add_clean_history(entry: CleanHistoryEntry) -> Result<(), AppError> {
+    crate::logging::log_command_start("add_clean_history");
+    crate::logging::log_command_ok(
+        "add_clean_history",
+        &format!(
+            "module={}, freed_bytes={}, success={}, failed={}",
+            entry.module, entry.freed_bytes, entry.success_count, entry.failed_count
+        ),
+    );
     let dir = macmate_dir()?;
     add_clean_history_at(&dir, entry)
 }
@@ -88,8 +96,11 @@ pub async fn add_clean_history(entry: CleanHistoryEntry) -> Result<(), AppError>
 /// 清空清理历史。
 #[tauri::command]
 pub async fn clear_clean_history() -> Result<(), AppError> {
+    crate::logging::log_command_start("clear_clean_history");
     let dir = macmate_dir()?;
-    clear_clean_history_at(&dir)
+    let r = clear_clean_history_at(&dir);
+    crate::logging::log_command_ok("clear_clean_history", "ok");
+    r
 }
 
 #[cfg(test)]

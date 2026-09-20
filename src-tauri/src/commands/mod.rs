@@ -5,6 +5,8 @@ pub mod config;
 pub mod deep_clean;
 pub mod history;
 pub mod large_files;
+pub mod logs;
+pub mod meta;
 pub mod privacy;
 pub mod system_junk;
 pub mod uninstaller;

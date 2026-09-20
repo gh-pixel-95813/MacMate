@@ -226,6 +226,22 @@ impl Default for AppConfig {
     }
 }
 
+/// 系统环境信息(供 Settings 关于区与日志上报 Issue 正文头使用)。
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SystemInfo {
+    /// macOS 产品版本号(如 `14.5`);非 macOS 平台为 `unknown`。
+    pub os_version: String,
+    /// CPU 架构(`aarch64` / `x86_64` 等)。
+    pub arch: String,
+    /// 主机名。
+    pub hostname: String,
+    /// 根挂载点磁盘总容量(字节)。
+    pub disk_total_bytes: u64,
+    /// 根挂载点磁盘可用容量(字节)。
+    pub disk_available_bytes: u64,
+}
+
 /// Tauri 命令统一错误类型。
 ///
 /// 注意:不实现 `serde::Serialize`,而是显式实现 `Into<InvokeError>`,

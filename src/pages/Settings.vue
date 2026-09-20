@@ -72,8 +72,85 @@ async function onOpenConfigDir() {
   }
 }
 
-// 关于:版本硬编码(与 package.json / AppSidebar 一致)。
-const APP_VERSION = '0.1.0';
+// 日志上报(Task 11):GitHub PAT 管理与日志上报到 GitHub Issue。
+// - onCheckTokenStatus:启动时调用一次,展示当前 PAT 是否已配置。
+// - onSaveToken:把用户输入的 PAT 存到 macOS Keychain(服务名 com.macmate.app)。
+// - onClearToken:删除 Keychain 中的 PAT。
+// - onSubmitLogs:读取最近 N 天本地日志,脱敏 + 截断后调 GitHub API 创建 Issue。
+interface GithubTokenStatus {
+  configured: boolean;
+  targetRepo: string;
+}
+interface SubmitResult {
+  issueNumber: number;
+  htmlUrl: string;
+  filesRead: number;
+  bodyBytes: number;
+}
+
+const tokenStatus = ref<GithubTokenStatus | null>(null);
+const tokenInput = ref('');
+const tokenMsg = ref<string | null>(null);
+const submitting = ref(false);
+const submitMsg = ref<string | null>(null);
+const submitDays = ref(7);
+
+async function refreshTokenStatus() {
+  try {
+    tokenStatus.value = await invoke<GithubTokenStatus>('get_github_token_status');
+  } catch (e) {
+    tokenStatus.value = null;
+    tokenMsg.value = String(e);
+  }
+}
+
+async function onSaveToken() {
+  tokenMsg.value = null;
+  const v = tokenInput.value.trim();
+  if (!v) {
+    tokenMsg.value = t('settings.tokenEmpty');
+    return;
+  }
+  try {
+    await invoke('save_github_token', { token: v });
+    tokenInput.value = '';
+    await refreshTokenStatus();
+    tokenMsg.value = t('settings.tokenSaved');
+  } catch (e) {
+    tokenMsg.value = String(e);
+  }
+}
+
+async function onClearToken() {
+  tokenMsg.value = null;
+  try {
+    await invoke('clear_github_token');
+    await refreshTokenStatus();
+    tokenMsg.value = t('settings.tokenCleared');
+  } catch (e) {
+    tokenMsg.value = String(e);
+  }
+}
+
+async function onSubmitLogs() {
+  submitMsg.value = null;
+  submitting.value = true;
+  try {
+    const result = await invoke<SubmitResult>('submit_logs_to_github', {
+      days: submitDays.value,
+    });
+    submitMsg.value = `${t('settings.submitOk')} #${result.issueNumber} ${result.htmlUrl}`;
+  } catch (e) {
+    submitMsg.value = String(e);
+  } finally {
+    submitting.value = false;
+  }
+}
+
+// 启动时拉一次 PAT 状态:Settings 页是首次能拿到结果的地方。
+void refreshTokenStatus();
+
+// 关于:版本号从 store 读(App.vue hydrate 时已经从后端 get_app_version 拿到)。
 const GITHUB_URL = 'https://github.com/gh-pixel-95813/MacMate';
 const LICENSE_NAME = 'MIT';
 
@@ -245,7 +322,105 @@ const themeOptions: Array<{ value: Theme; labelKey: string }> = [
       </div>
     </section>
 
-    <!-- 分区 4:关于 -->
+    <!-- 分区 4:日志与上报(Task 11) -->
+    <section class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ t('settings.loggingAndReport') }}
+      </h2>
+      <div
+        class="mt-3 space-y-4 rounded-2xl border border-gray-200/60 bg-white/70 p-5 backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-900/70"
+      >
+        <!-- 状态提示 -->
+        <div
+          class="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
+        >
+          <p>
+            {{ t('settings.reportIntro') }}
+          </p>
+          <p v-if="tokenStatus" class="mt-1">
+            <span v-if="tokenStatus.configured">{{ t('settings.tokenConfigured') }}</span>
+            <span v-else>{{ t('settings.tokenNotConfigured') }}</span>
+            <span class="ml-1 text-gray-500 dark:text-gray-400">
+              ({{ tokenStatus.targetRepo }})
+            </span>
+          </p>
+        </div>
+
+        <!-- PAT 输入 -->
+        <div class="space-y-2">
+          <label
+            for="pat-input"
+            class="block text-xs font-semibold text-gray-700 dark:text-gray-300"
+          >
+            {{ t('settings.tokenLabel') }}
+          </label>
+          <input
+            id="pat-input"
+            v-model="tokenInput"
+            type="password"
+            autocomplete="off"
+            :placeholder="t('settings.tokenPlaceholder')"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-100"
+          />
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+              @click="onSaveToken"
+            >
+              {{ t('settings.tokenSave') }}
+            </button>
+            <button
+              v-if="tokenStatus?.configured"
+              type="button"
+              class="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/40"
+              @click="onClearToken"
+            >
+              {{ t('settings.tokenClear') }}
+            </button>
+          </div>
+          <p v-if="tokenMsg" class="text-xs text-gray-500 dark:text-gray-400">
+            {{ tokenMsg }}
+          </p>
+        </div>
+
+        <!-- 日志上报 -->
+        <div class="space-y-2 border-t border-gray-200/60 pt-3 dark:border-zinc-800/60">
+          <label
+            for="days-input"
+            class="block text-xs font-semibold text-gray-700 dark:text-gray-300"
+          >
+            {{ t('settings.reportDaysLabel') }}
+          </label>
+          <div class="flex items-center gap-3">
+            <input
+              id="days-input"
+              v-model.number="submitDays"
+              type="number"
+              min="1"
+              max="30"
+              class="w-24 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-100"
+            />
+            <button
+              type="button"
+              :disabled="submitting || !tokenStatus?.configured"
+              class="rounded-md border border-blue-500 bg-blue-500 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              @click="onSubmitLogs"
+            >
+              {{ submitting ? '…' : t('settings.reportSubmit') }}
+            </button>
+          </div>
+          <p v-if="submitMsg" class="break-all text-xs text-gray-500 dark:text-gray-400">
+            {{ submitMsg }}
+          </p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ t('settings.reportPrivacy') }}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 分区 5:关于 -->
     <section class="mt-6">
       <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
         {{ t('settings.about') }}
@@ -256,7 +431,7 @@ const themeOptions: Array<{ value: Theme; labelKey: string }> = [
         <div class="flex items-center justify-between gap-4">
           <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.version') }}</span>
           <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            v{{ APP_VERSION }}
+            v{{ appStore.appVersion }}
           </span>
         </div>
         <div class="flex items-center justify-between gap-4">

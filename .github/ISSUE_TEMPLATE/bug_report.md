@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 ## Environment
 - macOS version: [e.g. macOS 14.5]
 - Mac architecture: [Apple Silicon / Intel]
-- MacMate version: [e.g. 0.1.0]
+- MacMate version: [e.g. 0.2.0]
 
 ## Additional context
 Add any other context about the problem here.

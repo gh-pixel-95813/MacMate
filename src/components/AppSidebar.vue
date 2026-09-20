@@ -2,6 +2,7 @@
 import { h, type FunctionalComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useAppStore } from '@/stores/app';
 
 interface NavItem {
   name: string;
@@ -21,6 +22,7 @@ const navItems: NavItem[] = [
 
 const route = useRoute();
 const { t } = useI18n();
+const appStore = useAppStore();
 
 // 选中态:'/' 精确匹配,其他项支持子路由前缀
 function isActive(path: string): boolean {
@@ -128,7 +130,7 @@ NavIcon.props = ['name'];
       </RouterLink>
     </nav>
 
-    <!-- 底部版本号 -->
-    <div class="px-5 py-3 text-xs text-gray-400 dark:text-gray-600">v0.1.0</div>
+    <!-- 底部版本号:从 store 读动态版本,App.vue 启动时 hydrate -->
+    <div class="px-5 py-3 text-xs text-gray-400 dark:text-gray-600">v{{ appStore.appVersion }}</div>
   </aside>
 </template>

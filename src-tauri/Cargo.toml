@@ -32,6 +32,12 @@ trash = "5"
 plist = "1"
 # 大文件扫描:sha2 计算重复文件哈希。
 sha2 = "0.11"
+# 日志与上报:tracing 生态用于本地按天滚动日志,ureq 用于上报到 GitHub Issue。
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+ureq = { version = "2", features = ["json"] }
+url = "2"
 
 [dev-dependencies]
 tempfile = "3"

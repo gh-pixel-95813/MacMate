@@ -191,6 +191,7 @@ fn clean_system_junk_inner(items: Vec<String>) -> CleanOutcome {
 /// 非 macOS 平台返回空结果以便 CI 跑通。
 #[tauri::command]
 pub async fn scan_system_junk() -> Result<ScanResult, AppError> {
+    crate::logging::log_command_start("scan_system_junk");
     let items: Vec<ScanItem> = {
         #[cfg(target_os = "macos")]
         {
@@ -204,12 +205,22 @@ pub async fn scan_system_junk() -> Result<ScanResult, AppError> {
             Vec::new()
         }
     };
-    Ok(summarize(items))
+    let result = summarize(items);
+    crate::logging::log_command_ok(
+        "scan_system_junk",
+        &format!("items={}, bytes={}", result.items.len(), result.total_size_bytes),
+    );
+    Ok(result)
 }
 
 /// 清理选中项。参数为 path 列表(简化设计:id 即 path)。
 #[tauri::command]
 pub async fn clean_system_junk(items: Vec<String>) -> Result<CleanOutcome, AppError> {
+    crate::logging::log_command_start("clean_system_junk");
+    crate::logging::log_command_ok(
+        "clean_system_junk",
+        &format!("input_items={}", items.len()),
+    );
     Ok(clean_system_junk_inner(items))
 }
 

@@ -7,6 +7,9 @@
 // 工具层模块声明为 `pub`:它们是 Task 4-7(扫描器 / 清理器 / 命令)将调用的
 // 公共工具 API,也便于集成测试直接引用,同时避免在未被调用前触发 dead_code。
 pub mod fsutil;
+pub mod keychain;
+pub mod logging;
+pub mod reporting;
 pub mod safety;
 pub mod sudo;
 pub mod trash;
@@ -44,6 +47,13 @@ fn get_disk_usage() -> Result<DiskUsage, AppError> {
 ///
 /// Task 3 的 `get_disk_usage` + Task 4-7 的四个清理模块命令统一在此注册。
 pub fn run() {
+    // 初始化本地日志:按天滚动到 ~/.macmate/logs/macmate.YYYY-MM-DD.log。
+    // 失败不阻塞启动(只是少了本地日志),仅打一条 stderr 警告。
+    if let Err(e) = logging::init_logger() {
+        eprintln!("macmate: logging init failed: {e}");
+    }
+    tracing::info!("macmate starting, version = {}", env!("CARGO_PKG_VERSION"));
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             // 仪表盘
@@ -74,6 +84,13 @@ pub fn run() {
             commands::config::get_config,
             commands::config::save_config,
             commands::config::reveal_config_dir,
+            // 日志与上报:动态版本号 + 系统信息 + GitHub PAT 管理 + 日志上报
+            commands::meta::get_app_version,
+            commands::meta::get_system_info,
+            commands::logs::get_github_token_status,
+            commands::logs::save_github_token,
+            commands::logs::clear_github_token,
+            commands::logs::submit_logs_to_github,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

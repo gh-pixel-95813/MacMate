@@ -9,6 +9,7 @@ export type Theme = 'system' | 'light' | 'dark';
 // 应用全局状态 store,记录扫描状态、语言、主题与系统主题偏好。
 // Task 9.3:locale / theme / deepClean / largeFileThresholdMb 通过
 // `~/.macmate/config.json` 持久化(setter 自动落盘,启动时由 hydrateFromConfig 加载)。
+// 日志上报(Task 11):appVersion 由 get_app_version 命令动态读取,避免硬编码。
 export const useAppStore = defineStore('app', () => {
   const isScanning = ref(false);
   const locale = ref<'zh-CN' | 'en-US'>('zh-CN');
@@ -20,6 +21,8 @@ export const useAppStore = defineStore('app', () => {
   const deepClean = ref(false);
   // 大文件扫描阈值(MB),低于此大小的文件不进入大文件列表。默认 50。
   const largeFileThresholdMb = ref(50);
+  // 应用版本号:启动时从后端 get_app_version 读出,默认 '0.0.0' 占位。
+  const appVersion = ref('0.0.0');
 
   // 启动时 hydrate 期间置为 true,抑制 setter 触发不必要的回写。
   let hydrating = false;
@@ -65,6 +68,7 @@ export const useAppStore = defineStore('app', () => {
 
   // 从后端加载配置(app.vue onMounted 调用),直接写 ref 不触发回写。
   // 调用方负责同步 i18n.global.locale.value 与 useTheme().apply()。
+  // 同时拉取应用版本号,供 Settings / Sidebar 显示真实打包版本。
   async function hydrateFromConfig(): Promise<void> {
     hydrating = true;
     try {
@@ -84,6 +88,15 @@ export const useAppStore = defineStore('app', () => {
     } finally {
       hydrating = false;
     }
+    // 单独 try,版本号读取失败不影响主配置。
+    try {
+      const v = await invoke<string>('get_app_version');
+      if (typeof v === 'string' && v.length > 0) {
+        appVersion.value = v;
+      }
+    } catch {
+      // 非 Tauri 环境保持 '0.0.0' 占位。
+    }
   }
 
   // 当前是否为暗色:light → false,dark → true,system → 系统偏好
@@ -100,6 +113,7 @@ export const useAppStore = defineStore('app', () => {
     systemDark,
     deepClean,
     largeFileThresholdMb,
+    appVersion,
     isDark,
     setLocale,
     setTheme,
