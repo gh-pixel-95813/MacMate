@@ -23,7 +23,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 walkdir = "2"
 sysinfo = "0.38"
-thiserror = "1"
+thiserror = "2"
 # `dirs` 用于在 macOS 上解析当前用户 home 目录,供 Task 4+ 的扫描器使用。
 dirs = "6"
 # `trash` 跨平台移至废纸篓:macOS 上通过 Finder 走系统废纸篓(可恢复)。
