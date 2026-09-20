@@ -3,20 +3,22 @@ import { computed, onMounted, ref } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import { useI18n } from 'vue-i18n';
 
-// Tauri 命令 get_disk_usage 的返回结构(Task 3 实现)
+// Tauri 命令 get_disk_usage 的返回结构(Task 3 实现,后端 serde camelCase)
 interface DiskUsage {
-  total: number; // bytes
-  used: number; // bytes
-  available: number; // bytes
+  totalBytes: number; // bytes
+  usedBytes: number; // bytes
+  availableBytes: number; // bytes
+  mountPoint: string;
 }
 
 const { t } = useI18n();
 
 // 占位数据,用于命令未实现或调用失败时兜底显示
 const PLACEHOLDER: DiskUsage = {
-  total: 512 * 1024 * 1024 * 1024,
-  used: 234 * 1024 * 1024 * 1024,
-  available: (512 - 234) * 1024 * 1024 * 1024,
+  totalBytes: 512 * 1024 * 1024 * 1024,
+  usedBytes: 234 * 1024 * 1024 * 1024,
+  availableBytes: (512 - 234) * 1024 * 1024 * 1024,
+  mountPoint: '/',
 };
 
 const loading = ref(true);
@@ -27,14 +29,14 @@ function formatGB(bytes: number): number {
   return Math.round((bytes / 1024 / 1024 / 1024) * 10) / 10;
 }
 
-const usedGB = computed(() => formatGB(disk.value.used));
-const totalGB = computed(() => formatGB(disk.value.total));
-const availableGB = computed(() => formatGB(disk.value.available));
+const usedGB = computed(() => formatGB(disk.value.usedBytes));
+const totalGB = computed(() => formatGB(disk.value.totalBytes));
+const availableGB = computed(() => formatGB(disk.value.availableBytes));
 
 // 已用占比(0-1),用于环形进度
 const ratio = computed(() => {
-  if (disk.value.total <= 0) return 0;
-  return Math.min(1, Math.max(0, disk.value.used / disk.value.total));
+  if (disk.value.totalBytes <= 0) return 0;
+  return Math.min(1, Math.max(0, disk.value.usedBytes / disk.value.totalBytes));
 });
 
 // 环形周长(r=40),用于 stroke-dasharray / stroke-dashoffset
