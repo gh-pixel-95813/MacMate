@@ -4,11 +4,56 @@ updates:
     directory: /src-tauri
     schedule:
       interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 10
+    groups:
+      # 小版本/patch 依赖合并为一个 PR,减少噪音
+      cargo-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    # 大版本更新单独 PR,人工审核
+    labels:
+      - "dependencies"
+      - "backend"
+    ignore:
+      # sysinfo 0.39+ 要求 rustc 1.95,高于本仓库声明的 MSRV(1.85)。
+      # 保持在 0.38.x 以兼容较低版本工具链;升级前需先提升 rust-version。
+      - dependency-name: sysinfo
+        versions: [">=0.39"]
+
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "ui"
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    groups:
+      # 所有 github actions 更新合并为一个 PR
+      actions-all:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "ci"
