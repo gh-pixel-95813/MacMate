@@ -6,7 +6,7 @@ authors = ["MacMate Contributors"]
 license = "MIT"
 repository = "https://github.com/gh-pixel-95813/MacMate"
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.85"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -22,16 +22,16 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 walkdir = "2"
-sysinfo = "0.32"
+sysinfo = "0.38"
 thiserror = "1"
 # `dirs` 用于在 macOS 上解析当前用户 home 目录,供 Task 4+ 的扫描器使用。
-dirs = "5"
+dirs = "6"
 # `trash` 跨平台移至废纸篓:macOS 上通过 Finder 走系统废纸篓(可恢复)。
-trash = "3"
+trash = "5"
 # Task 5 应用卸载器:解析 .app bundle 的 Info.plist(CFBundleIdentifier)。
 plist = "1"
 # 大文件扫描:sha2 计算重复文件哈希。
-sha2 = "0.10"
+sha2 = "0.11"
 
 [dev-dependencies]
 tempfile = "3"
