@@ -30,11 +30,14 @@ jobs:
       - name: Autobuild (JS/TS)
         if: matrix.language == 'javascript-typescript'
         uses: github/codeql-action/autobuild@v3
-      - name: Build Rust
+      - name: Install Linux system dependencies (Tauri)
         if: matrix.language == 'rust'
         run: |
-          rustup toolchain install stable
-          cargo check --manifest-path src-tauri/Cargo.toml
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: Build Rust
+        if: matrix.language == 'rust'
+        run: cargo build --manifest-path src-tauri/Cargo.toml
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
