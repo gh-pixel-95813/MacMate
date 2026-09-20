@@ -12,8 +12,8 @@
 ---
 
 [![CI](https://github.com/gh-pixel-95813/MacMate/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/ci.yml)
-[![Release](https://github.com/gh-pixel-95813/MacMate/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/release.yml)
-[![E2E Tests](https://github.com/gh-pixel-95813/MacMate/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/e2e.yml)
+[![Release](https://github.com/gh-pixel-95813/MacMate/actions/workflows/release.yml/badge.svg)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/release.yml)
+[![E2E Tests](https://github.com/gh-pixel-95813/MacMate/actions/workflows/e2e.yml/badge.svg)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/e2e.yml)
 [![CodeQL](https://github.com/gh-pixel-95813/MacMate/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/codeql.yml)
 [![Homebrew Tap](https://github.com/gh-pixel-95813/MacMate/actions/workflows/update-homebrew-tap.yml/badge.svg?branch=main)](https://github.com/gh-pixel-95813/MacMate/actions/workflows/update-homebrew-tap.yml)
 
