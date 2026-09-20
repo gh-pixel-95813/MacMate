@@ -25,7 +25,7 @@ walkdir = "2"
 sysinfo = "0.38"
 thiserror = "1"
 # `dirs` 用于在 macOS 上解析当前用户 home 目录,供 Task 4+ 的扫描器使用。
-dirs = "6"
+dirs = "7"
 # `trash` 跨平台移至废纸篓:macOS 上通过 Finder 走系统废纸篓(可恢复)。
 trash = "5"
 # Task 5 应用卸载器:解析 .app bundle 的 Info.plist(CFBundleIdentifier)。
