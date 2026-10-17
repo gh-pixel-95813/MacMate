@@ -43,7 +43,7 @@
     "typescript": "^5.4.5",
     "vite": "^6.4.3",
     "vitest": "^4.1.11",
-    "vue-tsc": "^2.0.19"
+    "vue-tsc": "^3.3.11"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
